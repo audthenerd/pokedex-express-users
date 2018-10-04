@@ -3,7 +3,7 @@ var React = require("react");
 class Catch extends React.Component {
   render() {
 
-    console.log("this props:", this.props);
+    console.log("this props catch:", this.props);
 
     return (
       <html>

@@ -41,6 +41,8 @@ const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
+app.use(express.static(__dirname + '/public'));
+
 
 
 // Set react-views to be the default view engine
@@ -48,6 +50,8 @@ const reactEngine = require('express-react-views').createEngine();
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jsx');
 app.engine('jsx', reactEngine);
+
+var sha256 = require('js-sha256');
 
 /**
  * ===================================
@@ -164,9 +168,11 @@ const userNew = (request, response) => {
 
 const userCreate = (request, response) => {
 
-  const queryString = 'INSERT INTO users (name) VALUES ($1)';
+  const queryString = 'INSERT INTO users (name, password) VALUES ($1, $2)';
 
-  const values = [request.body.name];
+  var hashedValue = sha256(request.body.password.toLowerCase());
+
+  const values = [request.body.name.toLowerCase(), hashedValue];
 
   console.log(queryString);
 
@@ -179,17 +185,19 @@ const userCreate = (request, response) => {
     } else {
 
       console.log('Query result:', result);
-      response.render('user/catch', result);
+      response.render('users/catch', result);
       // redirect to home page
 
     }
   });
-  response.redirect('/');
+  // response.redirect('/');
 
 };
 
 
 const userCatch = (request, response) => {
+
+    // const queryString = 'SELECT users.id, pokemon.id FROM users_pokemon';
 
     response.render('users/catch', {id: request.params.id});
 };
@@ -223,7 +231,7 @@ const pokeCaught = (request, response) => {
 const pokeName = (request, response) => {
 
 
-    const queryString = `SELECT pokemon.name FROM pokemon INNER JOIN users_pokemon ON (users_pokemon.pokemon_id = pokemon.id) WHERE users_pokemon.user_id = ${request.params.id}`;
+    const queryString = `SELECT pokemon.name, pokemon.id FROM pokemon INNER JOIN users_pokemon ON (users_pokemon.pokemon_id = pokemon.id) WHERE users_pokemon.user_id = ${request.params.id}`;
 
         pool.query(queryString, (err, result) => {
 
@@ -239,7 +247,41 @@ const pokeName = (request, response) => {
                 };
 
         });
-}
+};
+
+
+const pokeShow = (request, response) => {
+
+    console.log("show poke", request.query);
+
+    response.redirect('/pokemon/'+ request.query.pokemon_id);
+};
+
+/**
+ * ===================================
+ * COOKIE COUNT
+ * ===================================
+ */
+
+const cookieCount = (request, response) => {
+
+    console.log("current visits: ", request.cookies['visits']);
+
+    var visits;
+
+    if( request.cookies['visits'] === undefined ){
+
+        visits = 1;
+
+    }else{
+        visits = parseInt( request.cookies['visits'] ) + 1;
+    }
+
+    // set cookie
+    response.cookie('visits', visits);
+
+    console.log('works!: '+visits);
+};
 
 
 
@@ -251,7 +293,7 @@ const pokeName = (request, response) => {
  */
 
 app.get('/', getRoot);
-
+app.get('/', cookieCount);
 app.get('/pokemon/:id/edit', editPokemonForm);
 app.get('/pokemon/new', getNew);
 app.get('/pokemon/:id', getPokemon);
@@ -266,10 +308,14 @@ app.delete('/pokemon/:id', deletePokemon);
 // TODO: New routes for creating users
 
 app.get('/users/new', userNew);
-app.post('/users', userCreate);
+app.post('/users/catch', userCreate);
 app.get('/users/:id/catch', userCatch);
 app.post('/users/inter', pokeCaught);
 app.get('/users/:id/caught', pokeName);
+app.get('/pokemon', pokeShow);
+
+var thing = require('./routes');
+thing( app, pool );
 
 
 

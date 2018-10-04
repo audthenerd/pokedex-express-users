@@ -1,0 +1,30 @@
+body {
+	margin: 10px 150px;
+}
+
+h1 {
+	text-align: center;
+}
+
+.links {
+	float: right;
+	margin-right: 160px;
+}
+
+.intro {
+	font-size: 20px;
+	text-align: center;
+	display: block;
+}
+
+.list {
+	margin: 60px auto;
+	text-align:justify;
+  text-justify:auto;
+}
+
+.list li {
+	display: inline-block;
+	margin: 20px;
+}
+

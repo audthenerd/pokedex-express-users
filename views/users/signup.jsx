@@ -6,8 +6,8 @@ class New extends React.Component {
       <html>
         <head />
         <body>
-            <h1>Create your account</h1>
-            <p> Please fill in your details below to create a new account!</p>
+            <h1>We couldn't find your account!</h1>
+            <p> Please fill in your details below to create one!</p>
               <form method="POST" action="/users/catch">
                 <div>
                   Username:<input name="name" type="text" />

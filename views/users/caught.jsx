@@ -8,7 +8,7 @@ class Caught extends React.Component {
 
 
         let dropList = this.props.caught.map(caught=> {
-            return <option name="pokemon_id" value = {caught.id}>{caught.name}</option>
+            return <option value = {caught.id}>{caught.name}</option>
         });
 
     return (
@@ -16,10 +16,13 @@ class Caught extends React.Component {
         <head />
         <body>
           <h1>Guess What You Caught?</h1>
-            <label>Select list</label>
-             <select id = "myList">
-             {dropList}
-             </select>
+            <form action="/pokemon">
+                <label>Pokemon caught</label>
+                <select name = "pokemon_id">
+                    {dropList}
+                </select>
+                <input type="submit" value="Submit" />
+            </form>
         </body>
       </html>
     );
